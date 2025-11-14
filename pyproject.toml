@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "orbital-layout"
+version = "0.1.0"
+description = "2D planetary-satellite based layout engine (force-directed style)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Your Name", email = "you@example.com" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+torch = ["torch>=2.3"]
+dev = [
+  "pytest",
+  "black",
+  "ruff",
+  "build",
+  "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourname/orbital-layout"
+Repository = "https://github.com/yourname/orbital-layout"
+Issues = "https://github.com/yourname/orbital-layout/issues"

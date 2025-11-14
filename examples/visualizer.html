@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orbital Layout · CPU Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        --bg: radial-gradient(circle at 20% 20%, #2b4162, #121212 60%);
+        --card-bg: rgba(7, 10, 18, 0.8);
+        --accent: #6de1ff;
+        --accent-2: #f7b267;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        color: #f4f4f4;
+      }
+
+      .viz-card {
+        width: min(900px, 100%);
+        padding: 1.5rem;
+        border-radius: 24px;
+        backdrop-filter: blur(12px);
+        background: var(--card-bg);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      header p {
+        margin: 0;
+        color: #b2b2c4;
+        font-size: 0.95rem;
+      }
+
+      #canvas-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+        overflow: hidden;
+      }
+
+      #space-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .planet {
+        fill: url(#planetGradient);
+        filter: drop-shadow(0 0 35px rgba(109, 225, 255, 0.4));
+      }
+
+      .satellite {
+        fill: var(--accent-2);
+        filter: drop-shadow(0 0 16px rgba(247, 178, 103, 0.7));
+        transition: r 0.2s ease;
+      }
+
+      .trails {
+        fill: none;
+      }
+
+      .trail {
+        fill: none;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        opacity: 0.7;
+        filter: drop-shadow(0 0 6px rgba(109, 225, 255, 0.3));
+      }
+
+      .hud {
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .controls-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        color: #cdd4ff;
+      }
+
+      .toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        cursor: pointer;
+      }
+
+      .toggle input {
+        width: 1.1rem;
+        height: 1.1rem;
+      }
+
+      .damping-control {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex: 1;
+      }
+
+      .damping-control input[type="range"] {
+        flex: 1;
+      }
+
+      input[type="range"] {
+        flex: 1;
+        accent-color: var(--accent);
+      }
+
+      .step-indicator {
+        min-width: 140px;
+        text-align: right;
+        color: var(--accent);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .play-button {
+        cursor: pointer;
+        border: none;
+        border-radius: 999px;
+        padding: 0.45rem 1.2rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        background: linear-gradient(120deg, var(--accent), #91f5ff);
+        color: #04131b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viz-card">
+      <header>
+        <h1>Orbital Layout · CPU Simulation</h1>
+        <p>Static preview powered by <code>sim_data.json</code></p>
+      </header>
+      <div id="canvas-wrapper">
+        <svg id="space-canvas" viewBox="0 0 600 600" aria-label="orbital layout canvas">
+          <defs>
+            <radialGradient id="planetGradient" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="40%" stop-color="#8feaff" />
+              <stop offset="100%" stop-color="#2b8fff" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="hud">
+        <div class="slider-row">
+          <button class="play-button" id="play">▶︎ Play</button>
+          <input type="range" id="timeline" min="0" max="0" value="0" />
+          <div class="step-indicator" id="step-indicator">Step 0 / 0</div>
+        </div>
+        <div class="controls-row">
+          <label class="toggle" title="Toggle trajectory visibility">
+            <input type="checkbox" id="trail-toggle" />
+            <span>Show trails</span>
+          </label>
+          <div class="damping-control">
+            <span>Damping (slow → fast)</span>
+            <input type="range" id="damping" min="0" max="1" step="0.05" value="0.3" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function init() {
+        try {
+          const response = await fetch("sim_data.json");
+          if (!response.ok) {
+            throw new Error(`Failed to load data: ${response.status}`);
+          }
+          const data = await response.json();
+          setupViz(data);
+        } catch (error) {
+          console.error(error);
+          alert("Failed to load sim_data.json. Run generate_positions.py and open this page via a local HTTP server.");
+        }
+      }
+
+      function setupViz(data) {
+        const svg = document.getElementById("space-canvas");
+        const timelineInput = document.getElementById("timeline");
+        const stepLabel = document.getElementById("step-indicator");
+        const playButton = document.getElementById("play");
+  const trailToggle = document.getElementById("trail-toggle");
+  const dampingInput = document.getElementById("damping");
+
+        const satelliteMeta = data.satellites || [];
+        const masses = satelliteMeta.map((sat) => Number(sat.mass) || 1);
+        const massStats = masses.length
+          ? {
+              min: Math.min(...masses),
+              max: Math.max(...masses),
+            }
+          : { min: 1, max: 1 };
+        const radiusRange = Math.max(massStats.max - massStats.min, 1e-6);
+        const baseRadius = 7;
+        const maxRadius = 20; // smaller than the planet radius (32)
+  const massToRadius = (index) => {
+          if (!masses.length) {
+            return baseRadius + 3;
+          }
+          const normalized = (masses[index] - massStats.min) / radiusRange;
+          return baseRadius + normalized * (maxRadius - baseRadius);
+        };
+
+        const { width, height } = data.canvas;
+        const viewSize = 600;
+        const scale = (value, max) => (value / max) * viewSize;
+
+        svg.innerHTML += ""; // ensure defs stay
+
+        const massToPlanetRadius = (mass) => {
+          if (!Number.isFinite(mass) || mass <= 0) {
+            return 28;
+          }
+          const minR = 20;
+          const maxR = 60;
+          const normalized = Math.min(Math.max(mass / 40, 0), 1);
+          return minR + normalized * (maxR - minR);
+        };
+
+        const planet = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        planet.setAttribute("class", "planet");
+        planet.setAttribute("cx", scale(data.planet.x, width));
+        planet.setAttribute("cy", scale(data.planet.y, height));
+        planet.setAttribute("r", massToPlanetRadius(data.planet.mass).toFixed(2));
+        svg.appendChild(planet);
+
+        const trailsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        trailsGroup.setAttribute("class", "trails");
+        svg.appendChild(trailsGroup);
+  trailsGroup.style.display = "none";
+
+        const palette = ["#6de1ff", "#f7b267", "#c972ff", "#63f5b8", "#ffa8e2"];
+        const trailPolylines = data.timeline[0].positions.map((_, i) => {
+          const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+          polyline.setAttribute("class", "trail");
+          polyline.setAttribute("stroke", palette[i % palette.length]);
+          trailsGroup.appendChild(polyline);
+          return polyline;
+        });
+
+        const satelliteNodes = data.timeline[0].positions.map((_, i) => {
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circle.setAttribute("class", "satellite");
+          circle.setAttribute("r", massToRadius(i).toFixed(2));
+          circle.setAttribute("fill", palette[i % palette.length]);
+          svg.appendChild(circle);
+          return circle;
+        });
+
+        const scaledTimeline = data.timeline.map((frame) =>
+          frame.positions.map((pos) => [scale(pos[0], width), scale(pos[1], height)])
+        );
+
+        const cumulativeTrails = scaledTimeline.reduce((acc, frame, stepIdx) => {
+          frame.forEach((coord, i) => {
+            const serialized = `${coord[0].toFixed(2)},${coord[1].toFixed(2)}`;
+            if (!acc[i]) {
+              acc[i] = [];
+            }
+            if (stepIdx === 0) {
+              acc[i][stepIdx] = serialized;
+            } else {
+              acc[i][stepIdx] = `${acc[i][stepIdx - 1]} ${serialized}`;
+            }
+          });
+          return acc;
+        }, []);
+
+        timelineInput.max = data.timeline.length - 1;
+        const updateFrame = (index) => {
+          const frame = scaledTimeline[index];
+          frame.forEach((pos, i) => {
+            satelliteNodes[i].setAttribute("cx", pos[0]);
+            satelliteNodes[i].setAttribute("cy", pos[1]);
+            trailPolylines[i].setAttribute("points", cumulativeTrails[i][index]);
+          });
+          const stepValue = data.timeline[index]?.step ?? index;
+          stepLabel.textContent = `Step ${stepValue} / ${data.timeline.length - 1}`;
+          timelineInput.value = index;
+        };
+
+        timelineInput.addEventListener("input", (event) => {
+          updateFrame(Number(event.target.value));
+        });
+
+        trailToggle.addEventListener("change", (event) => {
+          trailsGroup.style.display = event.target.checked ? "block" : "none";
+        });
+
+        const MIN_DELAY = 40;
+        const MAX_DELAY = 420;
+        const computeDelay = (value) => {
+          const t = Math.min(Math.max(parseFloat(value), 0), 1);
+          return MIN_DELAY + (1 - t) * (MAX_DELAY - MIN_DELAY);
+        };
+
+        let playDelay = computeDelay(dampingInput.value);
+        dampingInput.addEventListener("input", (event) => {
+          playDelay = computeDelay(event.target.value);
+        });
+
+        let playing = false;
+        let rafId = null;
+
+        const playLoop = () => {
+          let index = Number(timelineInput.value);
+          index = (index + 1) % data.timeline.length;
+          updateFrame(index);
+          rafId = setTimeout(playLoop, playDelay);
+        };
+
+        playButton.addEventListener("click", () => {
+          playing = !playing;
+          if (playing) {
+            playButton.textContent = "⏸ Pause";
+            playLoop();
+          } else {
+            playButton.textContent = "▶︎ Play";
+            clearTimeout(rafId);
+          }
+        });
+
+        updateFrame(0);
+      }
+
+      init();
+    </script>
+  </body>
+</html>
