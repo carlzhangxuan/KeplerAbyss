@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "orbital-layout"
-version = "0.1.0"
+version = "0.1.2"
 description = "2D planetary-satellite based layout engine (force-directed style)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -12,7 +12,11 @@ license = { text = "MIT" }
 authors = [
   { name = "Your Name", email = "you@example.com" }
 ]
-dependencies = []
+dependencies = [
+  "numpy>=1.24",
+  "matplotlib>=3.8",
+  "Pillow>=10.0",
+]
 
 [project.optional-dependencies]
 torch = ["torch>=2.3"]

@@ -20,8 +20,9 @@ def main() -> None:
         planet,
         satellites,
         canvas_size=(100, 100),
-        repel_k=50.0,
+        repel_k=12.0,
         damping=0.92,
+        viscous_drag=0.05,
         boundary_k=80.0,
         boundary_margin=12.0,
         gravity_wells=[

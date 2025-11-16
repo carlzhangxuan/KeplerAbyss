@@ -1,0 +1,62 @@
+{
+  "project_id": "demo_text",
+  "renderer": "cairo",
+  "default_canvas_size": [
+    1024,
+    1024
+  ],
+  "output_dir": "output/demo_text",
+  "candidates": {
+    "title": {
+      "text": "プレイステーションポータル",
+      "font_path": "fonts/NotoSansJP-Bold.ttf",
+      "font_size": 72,
+      "fill": 255,
+      "background": 0,
+      "canvas_size": [
+        1024,
+        1024
+      ],
+      "bbox": {
+        "x": 51,
+        "y": 481,
+        "w": 927,
+        "h": 69
+      },
+      "area": 16694,
+      "area_ratio": 0.015920639038085938,
+      "mask_path": "output/demo_text/title_mask.png",
+      "fitted_mask_path": "output/demo_text/title_mask_fit.png",
+      "fitted_shape": [
+        69,
+        927
+      ]
+    },
+    "subtitle": {
+      "text": "リモートプレイ専用端末",
+      "font_path": "fonts/NotoSansJP-Regular.ttf",
+      "font_size": 48,
+      "fill": 255,
+      "background": 0,
+      "canvas_size": [
+        1024,
+        1024
+      ],
+      "bbox": {
+        "x": 258,
+        "y": 492,
+        "w": 517,
+        "h": 46
+      },
+      "area": 6220,
+      "area_ratio": 0.005931854248046875,
+      "mask_path": "output/demo_text/subtitle_mask.png",
+      "fitted_mask_path": "output/demo_text/subtitle_mask_fit.png",
+      "fitted_shape": [
+        46,
+        517
+      ]
+    }
+  },
+  "summary_path": "output/demo_text/summary.json"
+}

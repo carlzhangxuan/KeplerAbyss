@@ -87,6 +87,32 @@
         transition: r 0.2s ease;
       }
 
+      .sat-label {
+        font-size: 0.65rem;
+        fill: #f4f4f4;
+        stroke: rgba(4, 19, 27, 0.8);
+        stroke-width: 0.5;
+        paint-order: stroke;
+        pointer-events: none;
+      }
+
+      .anchor-wells {
+        pointer-events: none;
+      }
+
+      .anchor-well {
+        fill: rgba(255, 255, 255, 0.08);
+        stroke-width: 1.8;
+        stroke-dasharray: 4 3;
+      }
+
+      .anchor-well-label {
+        font-size: 0.55rem;
+        fill: rgba(255, 255, 255, 0.85);
+        text-anchor: middle;
+        pointer-events: none;
+      }
+
       .trails {
         fill: none;
       }
@@ -174,7 +200,7 @@
     <div class="viz-card">
       <header>
         <h1>Orbital Layout · CPU Simulation</h1>
-        <p>Static preview powered by <code>sim_data.json</code></p>
+        <p id="data-label">Static preview powered by <code>sim_data.json</code></p>
       </header>
       <div id="canvas-wrapper">
         <svg id="space-canvas" viewBox="0 0 600 600" aria-label="orbital layout canvas">
@@ -209,7 +235,13 @@
     <script>
       async function init() {
         try {
-          const response = await fetch("sim_data.json");
+          const params = new URLSearchParams(window.location.search);
+          const dataFile = params.get("data") || "sim_data.json";
+          const label = document.getElementById("data-label");
+          if (label) {
+            label.innerHTML = `Static preview powered by <code>${dataFile}</code>`;
+          }
+          const response = await fetch(dataFile);
           if (!response.ok) {
             throw new Error(`Failed to load data: ${response.status}`);
           }
@@ -229,7 +261,7 @@
   const trailToggle = document.getElementById("trail-toggle");
   const dampingInput = document.getElementById("damping");
 
-        const satelliteMeta = data.satellites || [];
+  const satelliteMeta = data.satellites || [];
         const masses = satelliteMeta.map((sat) => Number(sat.mass) || 1);
         const massStats = masses.length
           ? {
@@ -271,6 +303,47 @@
         planet.setAttribute("r", massToPlanetRadius(data.planet.mass).toFixed(2));
         svg.appendChild(planet);
 
+        const anchorGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        anchorGroup.setAttribute("class", "anchor-wells");
+        svg.appendChild(anchorGroup);
+
+        const anchorsData = data.anchors || {};
+        const anchorLabels = Object.keys(anchorsData);
+        const anchorPalette = ["#fbff12", "#ff9e9e", "#9efff6", "#ffd966"];
+        const pxPerUnit = viewSize / width;
+        anchorLabels.forEach((label, labelIdx) => {
+          const color = anchorPalette[labelIdx % anchorPalette.length];
+          anchorsData[label].forEach((anchor, anchorIdx) => {
+            const cx = scale(anchor.x, width);
+            const cy = scale(anchor.y, height);
+            const radius = Number(anchor.radius) || 80;
+            const scaledRadius = Math.max(radius * pxPerUnit, 6);
+            const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            ring.setAttribute("class", "anchor-well");
+            ring.setAttribute("cx", cx.toFixed(2));
+            ring.setAttribute("cy", cy.toFixed(2));
+            ring.setAttribute("r", scaledRadius.toFixed(2));
+            ring.setAttribute("stroke", color);
+            anchorGroup.appendChild(ring);
+
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute("class", "anchor-well");
+            dot.setAttribute("cx", cx.toFixed(2));
+            dot.setAttribute("cy", cy.toFixed(2));
+            dot.setAttribute("r", 2.5);
+            dot.setAttribute("stroke", color);
+            dot.setAttribute("fill", color);
+            anchorGroup.appendChild(dot);
+
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("class", "anchor-well-label");
+            text.setAttribute("x", cx.toFixed(2));
+            text.setAttribute("y", (cy - 8).toFixed(2));
+            text.textContent = `${label}#${anchorIdx}`;
+            anchorGroup.appendChild(text);
+          });
+        });
+
         const trailsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
         trailsGroup.setAttribute("class", "trails");
         svg.appendChild(trailsGroup);
@@ -294,8 +367,18 @@
           return circle;
         });
 
+        const satelliteLabels = data.timeline[0].positions.map(() => {
+          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          text.setAttribute("class", "sat-label");
+          svg.appendChild(text);
+          return text;
+        });
+
         const scaledTimeline = data.timeline.map((frame) =>
           frame.positions.map((pos) => [scale(pos[0], width), scale(pos[1], height)])
+        );
+        const rawTimeline = data.timeline.map((frame) =>
+          frame.positions.map((pos) => [Number(pos[0]), Number(pos[1])])
         );
 
         const cumulativeTrails = scaledTimeline.reduce((acc, frame, stepIdx) => {
@@ -316,10 +399,15 @@
         timelineInput.max = data.timeline.length - 1;
         const updateFrame = (index) => {
           const frame = scaledTimeline[index];
+          const rawFrame = rawTimeline[index];
           frame.forEach((pos, i) => {
             satelliteNodes[i].setAttribute("cx", pos[0]);
             satelliteNodes[i].setAttribute("cy", pos[1]);
             trailPolylines[i].setAttribute("points", cumulativeTrails[i][index]);
+            const [rawX, rawY] = rawFrame?.[i] ?? [0, 0];
+            satelliteLabels[i].setAttribute("x", (pos[0] + 10).toFixed(2));
+            satelliteLabels[i].setAttribute("y", (pos[1] - 10).toFixed(2));
+            satelliteLabels[i].textContent = `${rawX.toFixed(1)}, ${rawY.toFixed(1)}`;
           });
           const stepValue = data.timeline[index]?.step ?? index;
           stepLabel.textContent = `Step ${stepValue} / ${data.timeline.length - 1}`;

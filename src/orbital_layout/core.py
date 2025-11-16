@@ -47,6 +47,8 @@ class LayoutSimulator:
         damping: float = 0.9,
         boundary_k: float = 0.0,
         boundary_margin: float = 10.0,
+        boundary_slope: float = 0.1,
+        boundary_span_ratio: float = 0.5,
         noise_sigma: float = 0.0,
         noise_seed: int | None = None,
         viscous_drag: float = 0.0,
@@ -60,6 +62,8 @@ class LayoutSimulator:
         self.damping = damping
         self.boundary_k = boundary_k
         self.boundary_margin = boundary_margin
+        self.boundary_slope = max(boundary_slope, 0.0)
+        self.boundary_span_ratio = min(max(boundary_span_ratio, 1e-3), 1.0)
         self.noise_sigma = noise_sigma
         self._noise_rng = random.Random(noise_seed) if noise_sigma > 0.0 else None
         self.viscous_drag = max(viscous_drag, 0.0)
@@ -134,27 +138,35 @@ class LayoutSimulator:
         return f_mag * dx / r, f_mag * dy / r
 
     def _boundary_force(self, satellite: Satellite) -> Tuple[float, float]:
-        margin = max(self.boundary_margin, 1e-3)
-        eps = 1e-4
+        if self.boundary_k <= 0.0 or self.boundary_slope <= 0.0:
+            return 0.0, 0.0
 
-        def inward_push(dist: float) -> float:
-            if dist >= margin:
+        span_x = max(self.boundary_margin, self.boundary_span_ratio * float(self.W))
+        span_y = max(self.boundary_margin, self.boundary_span_ratio * float(self.H))
+        sat_mass = max(satellite.mass, 1e-6)
+
+        def smoothstep(t: float) -> float:
+            return t * t * (3.0 - 2.0 * t)
+
+        def slope_push(dist: float, span: float, direction: float) -> float:
+            span = max(span, 1e-6)
+            if dist >= span:
                 return 0.0
-            strength = 1.0 - (dist / margin)
-            return self.boundary_k * strength
+            normalized = 1.0 - (dist / span)
+            weight = smoothstep(max(min(normalized, 1.0), 0.0))
+            base = self.boundary_k * self.boundary_slope
+            return direction * base * weight * sat_mass
 
         fx = 0.0
         fy = 0.0
 
-        # Left edge pushes +x
-        fx += inward_push(satellite.x)
-        # Right edge pushes -x
-        fx -= inward_push(self.W - satellite.x)
+        # Left edge pushes +x, right edge pushes -x
+        fx += slope_push(satellite.x, span_x, +1.0)
+        fx += slope_push(self.W - satellite.x, span_x, -1.0)
 
-        # Top edge pushes +y
-        fy += inward_push(satellite.y)
-        # Bottom edge pushes -y
-        fy -= inward_push(self.H - satellite.y)
+        # Top edge pushes +y, bottom edge pushes -y
+        fy += slope_push(satellite.y, span_y, +1.0)
+        fy += slope_push(self.H - satellite.y, span_y, -1.0)
 
         return fx, fy
 

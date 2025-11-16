@@ -1,0 +1,324 @@
+{
+  "project_id": "text_01",
+  "renderer": "cairo",
+  "default_canvas_size": [
+    1024,
+    1024
+  ],
+  "output_dir": "output/text_01",
+  "candidates": {
+    "title": {
+      "text": "プレイステーションポータル",
+      "font_path": "fonts/NotoSansJP-Bold.ttf",
+      "font_size": 48,
+      "fill": 255,
+      "background": 0,
+      "canvas_size": [
+        1024,
+        1024
+      ],
+      "bbox": {
+        "x": 205,
+        "y": 491,
+        "w": 618,
+        "h": 46
+      },
+      "area": 7929,
+      "area_ratio": 0.007561683654785156,
+      "mask_path": "output/text_01/title_mask.png",
+      "fitted_mask_path": "output/text_01/title_mask_fit.png",
+      "fitted_shape": [
+        46,
+        618
+      ],
+      "anchor_candidates": [
+        {
+          "index": 10,
+          "row": 1,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 153.60000000000002,
+          "fits": true
+        },
+        {
+          "index": 17,
+          "row": 2,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 256.0,
+          "fits": true
+        },
+        {
+          "index": 24,
+          "row": 3,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 358.40000000000003,
+          "fits": true
+        },
+        {
+          "index": 31,
+          "row": 4,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 460.8,
+          "fits": true
+        },
+        {
+          "index": 38,
+          "row": 5,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 563.2,
+          "fits": true
+        },
+        {
+          "index": 45,
+          "row": 6,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 665.6000000000001,
+          "fits": true
+        },
+        {
+          "index": 52,
+          "row": 7,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 768.0000000000001,
+          "fits": true
+        },
+        {
+          "index": 59,
+          "row": 8,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 870.4000000000001,
+          "fits": true
+        }
+      ],
+      "anchor_visualization_path": "output/text_01/title_anchor_map.png"
+    },
+    "subtitle": {
+      "text": "リモートプレイ専用端末",
+      "font_path": "fonts/NotoSansJP-Regular.ttf",
+      "font_size": 36,
+      "fill": 255,
+      "background": 0,
+      "canvas_size": [
+        1024,
+        1024
+      ],
+      "bbox": {
+        "x": 321,
+        "y": 497,
+        "w": 388,
+        "h": 35
+      },
+      "area": 3841,
+      "area_ratio": 0.0036630630493164062,
+      "mask_path": "output/text_01/subtitle_mask.png",
+      "fitted_mask_path": "output/text_01/subtitle_mask_fit.png",
+      "fitted_shape": [
+        35,
+        388
+      ],
+      "anchor_candidates": [
+        {
+          "index": 9,
+          "row": 1,
+          "col": 2,
+          "x": 358.4,
+          "y": 153.60000000000002,
+          "fits": true
+        },
+        {
+          "index": 10,
+          "row": 1,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 153.60000000000002,
+          "fits": true
+        },
+        {
+          "index": 11,
+          "row": 1,
+          "col": 4,
+          "x": 665.6,
+          "y": 153.60000000000002,
+          "fits": true
+        },
+        {
+          "index": 16,
+          "row": 2,
+          "col": 2,
+          "x": 358.4,
+          "y": 256.0,
+          "fits": true
+        },
+        {
+          "index": 17,
+          "row": 2,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 256.0,
+          "fits": true
+        },
+        {
+          "index": 18,
+          "row": 2,
+          "col": 4,
+          "x": 665.6,
+          "y": 256.0,
+          "fits": true
+        },
+        {
+          "index": 23,
+          "row": 3,
+          "col": 2,
+          "x": 358.4,
+          "y": 358.40000000000003,
+          "fits": true
+        },
+        {
+          "index": 24,
+          "row": 3,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 358.40000000000003,
+          "fits": true
+        },
+        {
+          "index": 25,
+          "row": 3,
+          "col": 4,
+          "x": 665.6,
+          "y": 358.40000000000003,
+          "fits": true
+        },
+        {
+          "index": 30,
+          "row": 4,
+          "col": 2,
+          "x": 358.4,
+          "y": 460.8,
+          "fits": true
+        },
+        {
+          "index": 31,
+          "row": 4,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 460.8,
+          "fits": true
+        },
+        {
+          "index": 32,
+          "row": 4,
+          "col": 4,
+          "x": 665.6,
+          "y": 460.8,
+          "fits": true
+        },
+        {
+          "index": 37,
+          "row": 5,
+          "col": 2,
+          "x": 358.4,
+          "y": 563.2,
+          "fits": true
+        },
+        {
+          "index": 38,
+          "row": 5,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 563.2,
+          "fits": true
+        },
+        {
+          "index": 39,
+          "row": 5,
+          "col": 4,
+          "x": 665.6,
+          "y": 563.2,
+          "fits": true
+        },
+        {
+          "index": 44,
+          "row": 6,
+          "col": 2,
+          "x": 358.4,
+          "y": 665.6000000000001,
+          "fits": true
+        },
+        {
+          "index": 45,
+          "row": 6,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 665.6000000000001,
+          "fits": true
+        },
+        {
+          "index": 46,
+          "row": 6,
+          "col": 4,
+          "x": 665.6,
+          "y": 665.6000000000001,
+          "fits": true
+        },
+        {
+          "index": 51,
+          "row": 7,
+          "col": 2,
+          "x": 358.4,
+          "y": 768.0000000000001,
+          "fits": true
+        },
+        {
+          "index": 52,
+          "row": 7,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 768.0000000000001,
+          "fits": true
+        },
+        {
+          "index": 53,
+          "row": 7,
+          "col": 4,
+          "x": 665.6,
+          "y": 768.0000000000001,
+          "fits": true
+        },
+        {
+          "index": 58,
+          "row": 8,
+          "col": 2,
+          "x": 358.4,
+          "y": 870.4000000000001,
+          "fits": true
+        },
+        {
+          "index": 59,
+          "row": 8,
+          "col": 3,
+          "x": 511.99999999999994,
+          "y": 870.4000000000001,
+          "fits": true
+        },
+        {
+          "index": 60,
+          "row": 8,
+          "col": 4,
+          "x": 665.6,
+          "y": 870.4000000000001,
+          "fits": true
+        }
+      ],
+      "anchor_visualization_path": "output/text_01/subtitle_anchor_map.png"
+    }
+  },
+  "candidates_json_path": "output/text_01/candidates.json"
+}
